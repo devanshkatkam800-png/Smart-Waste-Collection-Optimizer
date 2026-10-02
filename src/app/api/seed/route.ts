@@ -108,7 +108,7 @@ export async function POST() {
       },
     });
 
-    // Complaint 1: Andheri West, Plastic, Assigned
+    // Complaint 1: Andheri West, Plastic, Assigned (85 - Red)
     const complaint1 = await prisma.complaint.create({
       data: {
         ticketNo: "EC-20261002-101",
@@ -121,7 +121,7 @@ export async function POST() {
         longitude: 72.8277,
         address: "Andheri West, Near Infinity Mall, Link Road, Mumbai",
         priorityLevel: "HIGH",
-        priorityScore: 78,
+        priorityScore: 85,
         aiConfidence: 0.96,
         status: "ASSIGNED",
         assignedWorkerId: worker1.id,
@@ -139,7 +139,7 @@ export async function POST() {
       },
     });
 
-    // Complaint 2: Bandra West, Organic, Pending
+    // Complaint 2: Bandra West, Organic, Pending (55 - Yellow)
     await prisma.complaint.create({
       data: {
         ticketNo: "EC-20261002-102",
@@ -151,8 +151,8 @@ export async function POST() {
         latitude: 19.0596,
         longitude: 72.8295,
         address: "Bandra West, Hill Road Commercial Arcade, Mumbai",
-        priorityLevel: "HIGH",
-        priorityScore: 84,
+        priorityLevel: "MEDIUM",
+        priorityScore: 55,
         aiConfidence: 0.95,
         status: "PENDING",
         citizenId: citizen.id,
@@ -161,7 +161,7 @@ export async function POST() {
       },
     });
 
-    // Complaint 3: Powai, E-Waste, Collected
+    // Complaint 3: Powai, E-Waste, Collected (25 - Green)
     const complaint3 = await prisma.complaint.create({
       data: {
         ticketNo: "EC-20261002-103",
@@ -173,8 +173,8 @@ export async function POST() {
         latitude: 19.1176,
         longitude: 72.9060,
         address: "Powai, Near Hiranandani Tech Park, Mumbai",
-        priorityLevel: "MEDIUM",
-        priorityScore: 68,
+        priorityLevel: "LOW",
+        priorityScore: 25,
         aiConfidence: 0.98,
         status: "COLLECTED",
         assignedWorkerId: worker1.id,

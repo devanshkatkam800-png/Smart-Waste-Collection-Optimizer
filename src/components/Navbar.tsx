@@ -103,37 +103,19 @@ export default function Navbar() {
                 );
               })
             ) : (
-              // Public Visitor Navigation (Rewaste-inspired section links)
+              // Public Visitor Navigation (Clean, minimal section links)
               <>
                 <Link
                   href="/#features"
-                  className="px-3.5 py-2 text-xs font-semibold text-slate-600 hover:text-emerald-700 hover:bg-emerald-50/50 rounded-full transition-all"
+                  className="px-4 py-2 text-xs font-semibold text-slate-600 hover:text-emerald-700 hover:bg-emerald-50/50 rounded-full transition-all"
                 >
                   Features
                 </Link>
                 <Link
                   href="/#how-it-works"
-                  className="px-3.5 py-2 text-xs font-semibold text-slate-600 hover:text-emerald-700 hover:bg-emerald-50/50 rounded-full transition-all"
+                  className="px-4 py-2 text-xs font-semibold text-slate-600 hover:text-emerald-700 hover:bg-emerald-50/50 rounded-full transition-all"
                 >
                   How It Works
-                </Link>
-                <Link
-                  href="/#impact"
-                  className="px-3.5 py-2 text-xs font-semibold text-slate-600 hover:text-emerald-700 hover:bg-emerald-50/50 rounded-full transition-all"
-                >
-                  Impact
-                </Link>
-                <Link
-                  href="/#about"
-                  className="px-3.5 py-2 text-xs font-semibold text-slate-600 hover:text-emerald-700 hover:bg-emerald-50/50 rounded-full transition-all"
-                >
-                  About
-                </Link>
-                <Link
-                  href="/#contact"
-                  className="px-3.5 py-2 text-xs font-semibold text-slate-600 hover:text-emerald-700 hover:bg-emerald-50/50 rounded-full transition-all"
-                >
-                  Contact
                 </Link>
               </>
             )}
@@ -225,27 +207,6 @@ export default function Navbar() {
                 className="block px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 hover:bg-slate-50"
               >
                 How It Works
-              </Link>
-              <Link
-                href="/#impact"
-                onClick={() => setMobileMenuOpen(false)}
-                className="block px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 hover:bg-slate-50"
-              >
-                Impact
-              </Link>
-              <Link
-                href="/#about"
-                onClick={() => setMobileMenuOpen(false)}
-                className="block px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 hover:bg-slate-50"
-              >
-                About
-              </Link>
-              <Link
-                href="/#contact"
-                onClick={() => setMobileMenuOpen(false)}
-                className="block px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 hover:bg-slate-50"
-              >
-                Contact
               </Link>
             </div>
           )}

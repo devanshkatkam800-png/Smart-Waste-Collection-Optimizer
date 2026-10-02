@@ -126,23 +126,30 @@ export default function OperationsMap({
     layer.clearLayers();
 
     const filteredComplaints = complaints.filter((c) => {
-      const matchP = filterPriority === "ALL" || c.priorityLevel === filterPriority;
+      const score = Number(c.priorityScore) ?? 0;
+      let effectiveLevel = c.priorityLevel;
+      if (score >= 70) effectiveLevel = "HIGH";
+      else if (score >= 45) effectiveLevel = "MEDIUM";
+      else if (score > 0) effectiveLevel = "LOW";
+
+      const matchP = filterPriority === "ALL" || effectiveLevel === filterPriority;
       const matchS = filterStatus === "ALL" || c.status === filterStatus;
       return matchP && matchS;
     });
 
     // Render Complaint Priority Markers:
-    // Red = High Priority, Yellow = Medium Priority, Green = Low Priority
+    // Red = High Priority (>=70), Yellow = Medium Priority (45-69), Green = Low Priority (<45)
     filteredComplaints.forEach((c) => {
       const isSelected = selectedComplaintId === c.id;
-      let color = "#10B981"; // Low Priority (Green)
+      const score = Number(c.priorityScore) ?? 0;
+      let color = "#10B981"; // Low Priority: Green (<45)
       let pulseClass = "";
 
-      if (c.priorityLevel === "HIGH") {
-        color = "#F43F5E"; // High Priority (Red)
+      if (score >= 70 || c.priorityLevel === "HIGH") {
+        color = "#EF4444"; // High Priority: Red (>=70)
         pulseClass = "pulse-urgent";
-      } else if (c.priorityLevel === "MEDIUM") {
-        color = "#F59E0B"; // Medium Priority (Yellow)
+      } else if (score >= 45 || c.priorityLevel === "MEDIUM") {
+        color = "#F59E0B"; // Medium Priority: Yellow (45-69)
       }
 
       const iconHtml = `
@@ -344,7 +351,7 @@ export default function OperationsMap({
           <span className="text-[10px] text-emerald-600 font-bold bg-emerald-50 px-1.5 py-0.2 rounded">19.076° N, 72.877° E</span>
         </div>
         <div className="flex items-center gap-2">
-          <span className="w-3 h-3 rounded-full bg-rose-500 ring-2 ring-rose-200"></span>
+          <span className="w-3 h-3 rounded-full bg-red-500 ring-2 ring-red-200"></span>
           <span className="text-slate-700 font-medium">Red = High Priority (&ge;70)</span>
         </div>
         <div className="flex items-center gap-2">
@@ -356,7 +363,7 @@ export default function OperationsMap({
           <span className="text-slate-700 font-medium">Green = Low Priority (&lt;45)</span>
         </div>
         <div className="flex items-center gap-2 pt-0.5 border-t border-slate-100">
-          <span className="w-3 h-3 text-center leading-none">🚚</span>
+          <span className="w-4 h-4 rounded-md bg-sky-600 text-white text-[10px] flex items-center justify-center">🚚</span>
           <span className="text-slate-700 font-medium">Blue = On-Duty Fleet Driver</span>
         </div>
         <div className="flex items-center gap-2">
