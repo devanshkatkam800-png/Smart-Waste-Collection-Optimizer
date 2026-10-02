@@ -63,13 +63,19 @@ export default function OperationsMap({
 }: Props) {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<any>(null);
-  const markersLayerRef = useRef<any>(null);
+  const leafletRef = useRef<any>(null);
+  const complaintsLayerRef = useRef<any>(null);
+  const workersLayerRef = useRef<any>(null);
+  const routesLayerRef = useRef<any>(null);
+
+  const [mapReady, setMapReady] = useState<boolean>(false);
   const [filterPriority, setFilterPriority] = useState<string>("ALL");
   const [filterStatus, setFilterStatus] = useState<string>("ALL");
   const [showWorkers, setShowWorkers] = useState<boolean>(true);
   const [showAssignmentRoutes, setShowAssignmentRoutes] = useState<boolean>(true);
   const [activePopupComplaint, setActivePopupComplaint] = useState<ComplaintMapItem | null>(null);
 
+  // Initialize Leaflet Map once
   useEffect(() => {
     if (!mapContainerRef.current || typeof window === "undefined") return;
 
@@ -86,30 +92,38 @@ export default function OperationsMap({
           attributionControl: false,
         });
 
-        // Crisp OpenStreetMap Carto tiles for clean Rewaste Smart City aesthetic
+        // Crisp OpenStreetMap Carto tiles
         L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
           maxZoom: 19,
         }).addTo(map);
 
-        const markersLayer = L.layerGroup().addTo(map);
-        mapInstanceRef.current = map;
-        markersLayerRef.current = markersLayer;
-      }
+        // Create separate layer groups in order of z-stacking:
+        // 1. Routes (bottom)
+        // 2. Workers (middle)
+        // 3. Complaints (top)
+        const routesLayer = L.layerGroup().addTo(map);
+        const workersLayer = L.layerGroup().addTo(map);
+        const complaintsLayer = L.layerGroup().addTo(map);
 
-      renderMarkers(L);
+        mapInstanceRef.current = map;
+        routesLayerRef.current = routesLayer;
+        workersLayerRef.current = workersLayer;
+        complaintsLayerRef.current = complaintsLayer;
+        leafletRef.current = L;
+
+        setMapReady(true);
+      }
     });
 
     return () => {
       isMounted = false;
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.remove();
+        mapInstanceRef.current = null;
+        setMapReady(false);
+      }
     };
   }, []);
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    import("leaflet").then((L) => {
-      renderMarkers(L);
-    });
-  }, [complaints, workers, filterPriority, filterStatus, showWorkers, showAssignmentRoutes, selectedComplaintId]);
 
   const handleJumpToZone = (loc: (typeof MUMBAI_NEIGHBORHOODS)[0]) => {
     const map = mapInstanceRef.current;
@@ -118,38 +132,72 @@ export default function OperationsMap({
     }
   };
 
-  const renderMarkers = (L: any) => {
+  const renderAllMarkers = (L: any) => {
     const map = mapInstanceRef.current;
-    const layer = markersLayerRef.current;
-    if (!map || !layer) return;
+    const complaintsLayer = complaintsLayerRef.current;
+    const workersLayer = workersLayerRef.current;
+    const routesLayer = routesLayerRef.current;
 
-    layer.clearLayers();
+    if (!map || !complaintsLayer || !workersLayer || !routesLayer) return;
 
+    // Clear all layers before re-rendering
+    complaintsLayer.clearLayers();
+    workersLayer.clearLayers();
+    routesLayer.clearLayers();
+
+    // 1. Filter Complaints by Priority and Status
     const filteredComplaints = complaints.filter((c) => {
-      const score = Number(c.priorityScore) ?? 0;
-      let effectiveLevel = c.priorityLevel;
+      const score = Number(c.priorityScore) || 0;
+      let effectiveLevel = String(c.priorityLevel || "").toUpperCase();
       if (score >= 70) effectiveLevel = "HIGH";
       else if (score >= 45) effectiveLevel = "MEDIUM";
-      else if (score > 0) effectiveLevel = "LOW";
+      else effectiveLevel = "LOW";
 
-      const matchP = filterPriority === "ALL" || effectiveLevel === filterPriority;
-      const matchS = filterStatus === "ALL" || c.status === filterStatus;
+      // Priority Filter
+      let matchP = true;
+      if (filterPriority === "HIGH") {
+        matchP = score >= 70 || effectiveLevel === "HIGH";
+      } else if (filterPriority === "MEDIUM") {
+        matchP = (score >= 45 && score < 70) || effectiveLevel === "MEDIUM";
+      } else if (filterPriority === "LOW") {
+        matchP = score < 45 || effectiveLevel === "LOW";
+      }
+
+      // Status Filter
+      let matchS = true;
+      if (filterStatus !== "ALL") {
+        const cStatus = String(c.status || "").toUpperCase();
+        if (filterStatus === "PENDING" || filterStatus === "OPEN") {
+          matchS = cStatus === "PENDING" || cStatus === "OPEN";
+        } else {
+          matchS = cStatus === filterStatus.toUpperCase();
+        }
+      }
+
       return matchP && matchS;
     });
 
-    // Render Complaint Priority Markers:
+    // 2. Render Complaint Markers (Red, Yellow, Green)
     // Red = High Priority (>=70), Yellow = Medium Priority (45-69), Green = Low Priority (<45)
     filteredComplaints.forEach((c) => {
+      const lat = Number(c.latitude);
+      const lng = Number(c.longitude);
+      if (isNaN(lat) || isNaN(lng)) return;
+
       const isSelected = selectedComplaintId === c.id;
-      const score = Number(c.priorityScore) ?? 0;
+      const score = Number(c.priorityScore) || 0;
+
       let color = "#10B981"; // Low Priority: Green (<45)
+      let effectiveLevel = "LOW";
       let pulseClass = "";
 
-      if (score >= 70 || c.priorityLevel === "HIGH") {
+      if (score >= 70 || String(c.priorityLevel).toUpperCase() === "HIGH") {
         color = "#EF4444"; // High Priority: Red (>=70)
+        effectiveLevel = "HIGH";
         pulseClass = "pulse-urgent";
-      } else if (score >= 45 || c.priorityLevel === "MEDIUM") {
+      } else if (score >= 45 || String(c.priorityLevel).toUpperCase() === "MEDIUM") {
         color = "#F59E0B"; // Medium Priority: Yellow (45-69)
+        effectiveLevel = "MEDIUM";
       }
 
       const iconHtml = `
@@ -159,8 +207,8 @@ export default function OperationsMap({
             height: ${isSelected ? "34px" : "28px"};
             border-radius: 9999px;
             background-color: ${color};
-            border: 3px solid #ffffff;
-            box-shadow: 0 4px 12px rgba(15,23,42,0.25);
+            border: 2.5px solid #ffffff;
+            box-shadow: 0 4px 12px rgba(15,23,42,0.35);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -169,9 +217,9 @@ export default function OperationsMap({
             font-weight: 800;
             cursor: pointer;
             transition: all 0.2s ease-in-out;
-            ${isSelected ? "transform: scale(1.3); outline: 3px solid #059669;" : ""}
+            ${isSelected ? "transform: scale(1.25); outline: 3px solid #059669;" : ""}
           ">
-            ${c.priorityScore}
+            ${score}
           </div>
         </div>
       `;
@@ -183,31 +231,43 @@ export default function OperationsMap({
         iconAnchor: [17, 17],
       });
 
-      const marker = L.marker([c.latitude, c.longitude], { icon: customIcon });
+      const marker = L.marker([lat, lng], {
+        icon: customIcon,
+        zIndexOffset: 1000, // Always render complaints on top
+      });
+
+      marker.bindTooltip(
+        `<strong>${c.ticketNo}</strong><br/>Priority: ${score} (${effectiveLevel})<br/>${c.address}`,
+        { direction: "top", offset: [0, -14] }
+      );
 
       marker.on("click", () => {
         setActivePopupComplaint(c);
         if (onSelectComplaint) onSelectComplaint(c);
       });
 
-      marker.addTo(layer);
+      marker.addTo(complaintsLayer);
 
       if (isSelected) {
-        map.setView([c.latitude, c.longitude], Math.max(map.getZoom(), 14), { animate: true });
+        map.setView([lat, lng], Math.max(map.getZoom(), 14), { animate: true });
       }
     });
 
-    // Render Fleet Vehicle GPS Pins
+    // 3. Render Fleet Vehicle GPS Pins (Blue 🚚)
     if (showWorkers) {
       workers.forEach((w) => {
+        const lat = Number(w.currentLat);
+        const lng = Number(w.currentLng);
+        if (isNaN(lat) || isNaN(lng)) return;
+
         const workerHtml = `
           <div style="
-            width: 30px;
-            height: 30px;
-            border-radius: 10px;
+            width: 32px;
+            height: 32px;
+            border-radius: 9px;
             background: linear-gradient(135deg, #0284c7, #0369a1);
             border: 2px solid white;
-            box-shadow: 0 4px 10px rgba(2, 132, 199, 0.35);
+            box-shadow: 0 4px 10px rgba(2, 132, 199, 0.4);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -222,20 +282,25 @@ export default function OperationsMap({
         const workerIcon = L.divIcon({
           html: workerHtml,
           className: "custom-worker-marker",
-          iconSize: [30, 30],
-          iconAnchor: [15, 15],
+          iconSize: [32, 32],
+          iconAnchor: [16, 16],
         });
 
-        const workerMarker = L.marker([w.currentLat, w.currentLng], { icon: workerIcon });
+        const workerMarker = L.marker([lat, lng], {
+          icon: workerIcon,
+          zIndexOffset: 500,
+        });
+
         workerMarker.bindTooltip(
-          `<strong>${w.name}</strong><br/>${w.vehicleType} &bull; ${w.activeMissionsCount} active mission(s)`,
-          { direction: "top", offset: [0, -10] }
+          `<strong>${w.name}</strong><br/>${w.vehicleType} &bull; ${w.status}`,
+          { direction: "top", offset: [0, -12] }
         );
-        workerMarker.addTo(layer);
+
+        workerMarker.addTo(workersLayer);
       });
     }
 
-    // Live Assignment Tracking: Render Connecting Vectors between Assigned Drivers & Complaints
+    // 4. Live Assignment Tracking: Render Connecting Vectors
     if (showAssignmentRoutes) {
       filteredComplaints.forEach((c) => {
         if (c.status === "ASSIGNED") {
@@ -248,8 +313,8 @@ export default function OperationsMap({
             const isSelected = selectedComplaintId === c.id;
             const routeLine = L.polyline(
               [
-                [matchedWorker.currentLat, matchedWorker.currentLng],
-                [c.latitude, c.longitude],
+                [Number(matchedWorker.currentLat), Number(matchedWorker.currentLng)],
+                [Number(c.latitude), Number(c.longitude)],
               ],
               {
                 color: isSelected ? "#059669" : "#0284c7",
@@ -259,19 +324,34 @@ export default function OperationsMap({
               }
             );
             routeLine.bindTooltip(
-              `<strong>Live Assignment Route</strong><br/>${matchedWorker.name} (${matchedWorker.vehicleType}) ➔ ${c.ticketNo}`,
+              `<strong>Live Assignment Route</strong><br/>${matchedWorker.name} ➔ ${c.ticketNo}`,
               { sticky: true }
             );
             routeLine.on("click", () => {
               setActivePopupComplaint(c);
               if (onSelectComplaint) onSelectComplaint(c);
             });
-            routeLine.addTo(layer);
+            routeLine.addTo(routesLayer);
           }
         }
       });
     }
   };
+
+  // Re-render markers whenever data, filters, or map readiness changes
+  useEffect(() => {
+    if (!mapReady || !leafletRef.current || !mapInstanceRef.current) return;
+    renderAllMarkers(leafletRef.current);
+  }, [
+    mapReady,
+    complaints,
+    workers,
+    filterPriority,
+    filterStatus,
+    showWorkers,
+    showAssignmentRoutes,
+    selectedComplaintId,
+  ]);
 
   return (
     <div className="relative w-full h-[540px] rounded-2xl overflow-hidden border border-slate-200/90 shadow-sm bg-slate-50">
@@ -287,9 +367,9 @@ export default function OperationsMap({
               className="border border-slate-300 rounded-lg px-2 py-1 text-xs bg-white text-slate-800 focus:outline-none focus:ring-1 focus:ring-emerald-500"
             >
               <option value="ALL">All Priorities</option>
-              <option value="HIGH">High (Red)</option>
-              <option value="MEDIUM">Medium (Yellow)</option>
-              <option value="LOW">Low (Green)</option>
+              <option value="HIGH">High (Red &ge;70)</option>
+              <option value="MEDIUM">Medium (Yellow 45-69)</option>
+              <option value="LOW">Low (Green &lt;45)</option>
             </select>
           </div>
 
@@ -301,7 +381,7 @@ export default function OperationsMap({
               className="border border-slate-300 rounded-lg px-2 py-1 text-xs bg-white text-slate-800 focus:outline-none focus:ring-1 focus:ring-emerald-500"
             >
               <option value="ALL">All Statuses</option>
-              <option value="PENDING">Pending</option>
+              <option value="PENDING">Open / Pending</option>
               <option value="ASSIGNED">Assigned</option>
               <option value="COLLECTED">Collected</option>
             </select>

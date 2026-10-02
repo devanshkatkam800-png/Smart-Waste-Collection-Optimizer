@@ -55,3 +55,10 @@
   border-radius: 0.75rem;
   z-index: 10;
 }
+
+/* Ensure Leaflet div-icons do not render default white square borders or background */
+.leaflet-div-icon {
+  background: transparent !important;
+  border: none !important;
+}
+

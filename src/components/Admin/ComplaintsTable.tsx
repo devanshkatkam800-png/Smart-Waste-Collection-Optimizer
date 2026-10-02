@@ -89,7 +89,10 @@ export default function ComplaintsTable({
       c.ticketNo.toLowerCase().includes(searchTerm.toLowerCase()) ||
       c.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       c.address.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchStatus = statusFilter === "ALL" || c.status === statusFilter;
+    const matchStatus =
+      statusFilter === "ALL" ||
+      c.status === statusFilter ||
+      (statusFilter === "PENDING" && (c.status === "Open" || c.status === "OPEN" || c.status === "PENDING"));
     const matchPriority = priorityFilter === "ALL" || c.priorityLevel === priorityFilter;
     return matchSearch && matchStatus && matchPriority;
   });
@@ -116,7 +119,9 @@ export default function ComplaintsTable({
             className="rounded-xl border border-slate-300 px-3 py-2 bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-emerald-500"
           >
             <option value="ALL">All Statuses ({complaints.length})</option>
-            <option value="PENDING">Pending ({complaints.filter((c) => c.status === "PENDING").length})</option>
+            <option value="PENDING">
+              Open / Pending ({complaints.filter((c) => c.status === "PENDING" || c.status === "Open" || c.status === "OPEN").length})
+            </option>
             <option value="ASSIGNED">Assigned ({complaints.filter((c) => c.status === "ASSIGNED").length})</option>
             <option value="COLLECTED">Collected ({complaints.filter((c) => c.status === "COLLECTED").length})</option>
           </select>

@@ -73,10 +73,10 @@ export async function POST() {
         phone: workerUser1.phone || "+91 98203 44556",
         vehicleType: "E-Trike Rapid",
         status: "ON_DUTY",
-        currentLat: 19.1363, // Andheri
-        currentLng: 72.8277,
+        currentLat: 19.1280, // Andheri West (SV Road corridor)
+        currentLng: 72.8360,
         maxCapacityKg: 250.0,
-        activeMissionsCount: 1,
+        activeMissionsCount: 0,
       },
     });
 
@@ -87,8 +87,8 @@ export async function POST() {
         phone: workerUser2.phone || "+91 98204 55667",
         vehicleType: "Electric Mini-Truck",
         status: "ACTIVE",
-        currentLat: 19.0596, // Bandra
-        currentLng: 72.8295,
+        currentLat: 19.0520, // Bandra West (Turner Road corridor)
+        currentLng: 72.8380,
         maxCapacityKg: 650.0,
         activeMissionsCount: 0,
       },
@@ -101,15 +101,16 @@ export async function POST() {
         phone: workerUser3.phone || "+91 98205 66778",
         vehicleType: "Hydraulic Compactor",
         status: "ACTIVE",
-        currentLat: 19.1176, // Powai
-        currentLng: 72.9060,
+        currentLat: 19.1240, // Powai (JVLR corridor)
+        currentLng: 72.9150,
         maxCapacityKg: 1200.0,
         activeMissionsCount: 0,
       },
     });
 
-    // Complaint 1: Andheri West, Plastic, Assigned (85 - Red)
-    const complaint1 = await prisma.complaint.create({
+    // 3 Guaranteed Test Records:
+    // Complaint 1: Andheri West, Plastic, Open/PENDING (85 - Red)
+    await prisma.complaint.create({
       data: {
         ticketNo: "EC-20261002-101",
         title: "Commercial plastic packaging and bottle dump",
@@ -123,23 +124,14 @@ export async function POST() {
         priorityLevel: "HIGH",
         priorityScore: 85,
         aiConfidence: 0.96,
-        status: "ASSIGNED",
-        assignedWorkerId: worker1.id,
+        status: "PENDING",
         citizenId: citizen.id,
         citizenName: citizen.name,
         imageUrl: "https://images.unsplash.com/photo-1618477461853-cf6ed80faba5?auto=format&fit=crop&w=600&q=80",
       },
     });
 
-    await prisma.assignment.create({
-      data: {
-        complaintId: complaint1.id,
-        workerId: worker1.id,
-        notes: "Assigned via EcoRoute AI Smart Proximity Dispatch",
-      },
-    });
-
-    // Complaint 2: Bandra West, Organic, Pending (55 - Yellow)
+    // Complaint 2: Bandra West, Organic, Open/PENDING (55 - Yellow)
     await prisma.complaint.create({
       data: {
         ticketNo: "EC-20261002-102",
@@ -161,12 +153,12 @@ export async function POST() {
       },
     });
 
-    // Complaint 3: Powai, E-Waste, Collected (25 - Green)
-    const complaint3 = await prisma.complaint.create({
+    // Complaint 3: Powai, E-Waste, Open/PENDING (25 - Green)
+    await prisma.complaint.create({
       data: {
         ticketNo: "EC-20261002-103",
         title: "Hazardous electronic scrap and battery packs",
-        description: "Discarded motherboards, power supplies, and lithium battery cells safely collected and sanitized.",
+        description: "Discarded motherboards, power supplies, and lithium battery cells safely contained for disposal.",
         wasteType: "E_WASTE",
         quantity: "SMALL",
         estimatedWeightKg: 16.0,
@@ -176,37 +168,16 @@ export async function POST() {
         priorityLevel: "LOW",
         priorityScore: 25,
         aiConfidence: 0.98,
-        status: "COLLECTED",
-        assignedWorkerId: worker1.id,
+        status: "PENDING",
         citizenId: citizen.id,
         citizenName: citizen.name,
         imageUrl: "https://images.unsplash.com/photo-1605600659908-0ef719419d41?auto=format&fit=crop&w=600&q=80",
       },
     });
 
-    await prisma.assignment.create({
-      data: {
-        complaintId: complaint3.id,
-        workerId: worker1.id,
-        notes: "Cleared and verified on site",
-        completedAt: new Date(Date.now() - 3600000),
-      },
-    });
-
-    await prisma.proofPhoto.create({
-      data: {
-        complaintId: complaint3.id,
-        workerId: worker1.id,
-        photoUrl: "https://images.unsplash.com/photo-1582408921715-18e7806365c1?auto=format&fit=crop&w=600&q=80",
-        notes: "Electronic waste packed into hazardous containment bins. Ground swept clean.",
-        verifiedByAdmin: true,
-        verifiedAt: new Date(),
-      },
-    });
-
     return NextResponse.json({
       success: true,
-      message: "Database reset to strictly 3 sample complaints.",
+      message: "Database reset to strictly 3 guaranteed test complaints (85 High, 55 Medium, 25 Low - All Status PENDING/Open).",
     });
   } catch (error: any) {
     console.error("Seed API error:", error);
