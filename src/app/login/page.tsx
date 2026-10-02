@@ -51,14 +51,14 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-[85vh] flex items-center justify-center px-4 py-12">
+    <div className="min-h-[85vh] flex items-center justify-center px-4 py-16 bg-white">
       <div className="max-w-md w-full space-y-6">
         {/* Brand Header */}
         <div className="text-center space-y-2">
           <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-500 text-white flex items-center justify-center mx-auto shadow-sm shadow-emerald-500/20">
             <Recycle className="w-6 h-6" />
           </div>
-          <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
             Sign In to EcoRoute AI
           </h1>
           <p className="text-xs text-slate-500">
@@ -67,7 +67,7 @@ export default function LoginPage() {
         </div>
 
         {/* Evaluation Helper Accounts (Pre-fills inputs for authentic evaluation) */}
-        <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/90 text-slate-800 space-y-2.5">
+        <div className="p-4 rounded-2xl bg-slate-50/80 border border-slate-100 text-slate-800 space-y-2.5">
           <div className="text-[10px] font-bold text-slate-600 uppercase tracking-wider flex items-center justify-between">
             <span className="flex items-center gap-1.5 font-semibold text-emerald-800">
               Evaluation Credentials
@@ -79,10 +79,10 @@ export default function LoginPage() {
             <button
               type="button"
               onClick={() => autofillAccount("citizen@ecoroute.ai")}
-              className={`p-2.5 rounded-xl border text-left transition-all ${
+              className={`p-3 rounded-2xl border text-left transition-all ${
                 email === "citizen@ecoroute.ai"
                   ? "bg-emerald-50 border-emerald-600 text-emerald-950 ring-1 ring-emerald-600 shadow-xs"
-                  : "bg-white border-slate-200/90 hover:border-emerald-500 hover:bg-emerald-50/30 text-slate-700 shadow-xs"
+                  : "bg-white border-slate-200/80 hover:border-emerald-500 hover:bg-emerald-50/30 text-slate-700 shadow-xs"
               }`}
             >
               <User className="w-4 h-4 text-emerald-700 mb-1" />
@@ -93,10 +93,10 @@ export default function LoginPage() {
             <button
               type="button"
               onClick={() => autofillAccount("admin@ecoroute.ai")}
-              className={`p-2.5 rounded-xl border text-left transition-all ${
+              className={`p-3 rounded-2xl border text-left transition-all ${
                 email === "admin@ecoroute.ai"
                   ? "bg-emerald-50 border-emerald-600 text-emerald-950 ring-1 ring-emerald-600 shadow-xs"
-                  : "bg-white border-slate-200/90 hover:border-emerald-500 hover:bg-emerald-50/30 text-slate-700 shadow-xs"
+                  : "bg-white border-slate-200/80 hover:border-emerald-500 hover:bg-emerald-50/30 text-slate-700 shadow-xs"
               }`}
             >
               <ShieldCheck className="w-4 h-4 text-slate-700 mb-1" />
@@ -107,10 +107,10 @@ export default function LoginPage() {
             <button
               type="button"
               onClick={() => autofillAccount("worker@ecoroute.ai")}
-              className={`p-2.5 rounded-xl border text-left transition-all ${
+              className={`p-3 rounded-2xl border text-left transition-all ${
                 email === "worker@ecoroute.ai"
                   ? "bg-emerald-50 border-emerald-600 text-emerald-950 ring-1 ring-emerald-600 shadow-xs"
-                  : "bg-white border-slate-200/90 hover:border-emerald-500 hover:bg-emerald-50/30 text-slate-700 shadow-xs"
+                  : "bg-white border-slate-200/80 hover:border-emerald-500 hover:bg-emerald-50/30 text-slate-700 shadow-xs"
               }`}
             >
               <Truck className="w-4 h-4 text-slate-700 mb-1" />
@@ -121,7 +121,7 @@ export default function LoginPage() {
         </div>
 
         {/* Login Form */}
-        <div className="bg-white rounded-3xl border border-slate-200/90 p-6 sm:p-7 shadow-[0_4px_25px_-5px_rgba(15,23,42,0.05)]">
+        <div className="bg-white rounded-3xl border border-slate-100 p-6 sm:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
           <form onSubmit={handleLogin} className="space-y-4">
             <div>
               <label className="text-xs font-bold text-slate-800 block mb-1.5">
@@ -135,7 +135,7 @@ export default function LoginPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="name@domain.com"
-                  className="w-full text-xs font-medium rounded-xl border border-slate-300 pl-10 pr-3.5 py-2.5 focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                  className="w-full text-xs font-medium rounded-xl border border-slate-200 pl-10 pr-3.5 py-3 focus:ring-2 focus:ring-emerald-500 focus:outline-none transition-all"
                 />
               </div>
             </div>
@@ -152,7 +152,7 @@ export default function LoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full text-xs font-medium rounded-xl border border-slate-300 pl-10 pr-3.5 py-2.5 focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                  className="w-full text-xs font-medium rounded-xl border border-slate-200 pl-10 pr-3.5 py-3 focus:ring-2 focus:ring-emerald-500 focus:outline-none transition-all"
                 />
               </div>
             </div>
@@ -167,7 +167,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs shadow-md shadow-emerald-600/20 transition-all flex items-center justify-center space-x-2 disabled:opacity-50"
+              className="w-full py-3.5 px-4 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-xs hover:shadow-emerald-600/20 transition-all flex items-center justify-center space-x-2 disabled:opacity-50"
             >
               {loading ? (
                 <>

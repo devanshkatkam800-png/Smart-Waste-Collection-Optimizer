@@ -48,97 +48,97 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-[80vh] flex items-center justify-center px-4 py-12">
+    <div className="min-h-[85vh] flex items-center justify-center px-4 py-16 bg-white">
       <div className="max-w-md w-full space-y-6">
         <div className="text-center space-y-2">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-500 text-white flex items-center justify-center mx-auto shadow-md shadow-emerald-500/20">
-            <Recycle className="w-7 h-7" />
+          <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-500 text-white flex items-center justify-center mx-auto shadow-sm shadow-emerald-500/20">
+            <Recycle className="w-6 h-6" />
           </div>
-          <h2 className="text-2xl font-bold text-slate-900 tracking-tight">
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
             Join EcoRoute AI
           </h2>
           <p className="text-xs text-slate-500">
-            Create an account to report sanitation issues and earn civic cleanup points
+            Create a profile to report sanitation issues and track municipal clearance
           </p>
         </div>
 
-        <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs">
+        <div className="bg-white rounded-3xl border border-slate-100 p-6 sm:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
           <form onSubmit={handleRegister} className="space-y-4">
             <div>
-              <label className="text-xs font-semibold text-slate-700 block mb-1">
+              <label className="text-xs font-bold text-slate-800 block mb-1.5">
                 Full Name
               </label>
               <div className="relative">
-                <User className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <User className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
                 <input
                   type="text"
                   required
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="E.g., Jane Doe"
-                  className="w-full text-xs rounded-xl border border-slate-300 pl-9 pr-3 py-2.5 focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                  className="w-full text-xs font-medium rounded-xl border border-slate-200 pl-10 pr-3.5 py-3 focus:ring-2 focus:ring-emerald-500 focus:outline-none transition-all"
                 />
               </div>
             </div>
 
             <div>
-              <label className="text-xs font-semibold text-slate-700 block mb-1">
-                Email Address
+              <label className="text-xs font-bold text-slate-800 block mb-1.5">
+                Official Email
               </label>
               <div className="relative">
-                <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
                 <input
                   type="email"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="name@domain.com"
-                  className="w-full text-xs rounded-xl border border-slate-300 pl-9 pr-3 py-2.5 focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                  className="w-full text-xs font-medium rounded-xl border border-slate-200 pl-10 pr-3.5 py-3 focus:ring-2 focus:ring-emerald-500 focus:outline-none transition-all"
                 />
               </div>
             </div>
 
             <div>
-              <label className="text-xs font-semibold text-slate-700 block mb-1">
+              <label className="text-xs font-bold text-slate-800 block mb-1.5">
                 Password
               </label>
               <div className="relative">
-                <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
                 <input
                   type="password"
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="At least 6 characters"
-                  className="w-full text-xs rounded-xl border border-slate-300 pl-9 pr-3 py-2.5 focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                  className="w-full text-xs font-medium rounded-xl border border-slate-200 pl-10 pr-3.5 py-3 focus:ring-2 focus:ring-emerald-500 focus:outline-none transition-all"
                 />
               </div>
             </div>
 
             <div>
-              <label className="text-xs font-semibold text-slate-700 block mb-1">
+              <label className="text-xs font-bold text-slate-800 block mb-1.5">
                 Phone Number (Optional)
               </label>
               <div className="relative">
-                <Phone className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <Phone className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
                 <input
                   type="tel"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                   placeholder="+91 98000 00000"
-                  className="w-full text-xs rounded-xl border border-slate-300 pl-9 pr-3 py-2.5 focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                  className="w-full text-xs font-medium rounded-xl border border-slate-200 pl-10 pr-3.5 py-3 focus:ring-2 focus:ring-emerald-500 focus:outline-none transition-all"
                 />
               </div>
             </div>
 
             <div>
-              <label className="text-xs font-semibold text-slate-700 block mb-1">
+              <label className="text-xs font-bold text-slate-800 block mb-1.5">
                 Registering As:
               </label>
               <select
                 value={role}
                 onChange={(e) => setRole(e.target.value)}
-                className="w-full text-xs rounded-xl border border-slate-300 px-3 py-2.5 bg-white text-slate-800 focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                className="w-full text-xs font-medium rounded-xl border border-slate-200 px-3.5 py-3 bg-white text-slate-800 focus:ring-2 focus:ring-emerald-500 focus:outline-none transition-all"
               >
                 <option value="CITIZEN">Citizen (Report & Track Waste)</option>
                 <option value="WORKER">Field Worker / Driver (Receive Missions)</option>
@@ -146,7 +146,7 @@ export default function RegisterPage() {
             </div>
 
             {errorMsg && (
-              <div className="p-3 rounded-lg bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2">
+              <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2">
                 <AlertCircle className="w-4 h-4 shrink-0" />
                 <span>{errorMsg}</span>
               </div>
@@ -155,7 +155,7 @@ export default function RegisterPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md transition-all flex items-center justify-center space-x-1.5 disabled:opacity-50"
+              className="w-full py-3.5 px-4 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-xs hover:shadow-emerald-600/20 transition-all flex items-center justify-center space-x-1.5 disabled:opacity-50"
             >
               {loading ? (
                 <>
@@ -168,9 +168,9 @@ export default function RegisterPage() {
             </button>
           </form>
 
-          <div className="mt-4 pt-4 border-t border-slate-100 text-center text-xs text-slate-500">
+          <div className="mt-5 pt-4 border-t border-slate-100 text-center text-xs text-slate-500">
             Already registered?{" "}
-            <Link href="/login" className="font-semibold text-emerald-600 hover:text-emerald-700">
+            <Link href="/login" className="font-bold text-emerald-700 hover:text-emerald-800">
               Sign In
             </Link>
           </div>

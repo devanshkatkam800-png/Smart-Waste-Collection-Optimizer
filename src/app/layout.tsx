@@ -16,7 +16,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="en" className="scroll-smooth">
       <head>
         <link
           rel="stylesheet"
@@ -25,7 +25,7 @@ export default function RootLayout({
           crossOrigin=""
         />
       </head>
-      <body className="bg-[#fbfcfd] min-h-screen flex flex-col antialiased text-slate-900 selection:bg-emerald-500 selection:text-white">
+      <body className="bg-white min-h-screen flex flex-col antialiased text-slate-900 selection:bg-emerald-500 selection:text-white">
         <Navbar />
         <main className="flex-1">{children}</main>
         <Footer />
