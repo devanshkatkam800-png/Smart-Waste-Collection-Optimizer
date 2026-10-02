@@ -1,0 +1,117 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id           String      @id @default(cuid())
+  name         String
+  email        String      @unique
+  passwordHash String
+  role         String      @default("CITIZEN") // "CITIZEN" | "ADMIN" | "WORKER"
+  phone        String?
+  avatar       String?
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  complaints   Complaint[] @relation("CitizenComplaints")
+  worker       Worker?
+}
+
+model Worker {
+  id                  String       @id @default(cuid())
+  userId              String?      @unique
+  user                User?        @relation(fields: [userId], references: [id])
+  name                String
+  phone               String
+  vehicleType         String       @default("E-Trike") // "E-Trike" | "Mini-Truck" | "Compactor"
+  status              String       @default("ACTIVE") // "ACTIVE" | "ON_DUTY" | "OFFLINE"
+  currentLat          Float        @default(12.9716)
+  currentLng          Float        @default(77.5946)
+  maxCapacityKg       Float        @default(250.0)
+  activeMissionsCount Int          @default(0)
+  createdAt           DateTime     @default(now())
+  updatedAt           DateTime     @updatedAt
+  complaints          Complaint[]  @relation("AssignedComplaints")
+  assignments         Assignment[]
+  proofPhotos         ProofPhoto[]
+}
+
+model Complaint {
+  id                String       @id @default(cuid())
+  ticketNo          String       @unique
+  citizenId         String?
+  citizen           User?        @relation("CitizenComplaints", fields: [citizenId], references: [id])
+  citizenName       String?
+  citizenPhone      String?
+  title             String
+  description       String?
+  wasteType         String       @default("MIXED") // "PLASTIC" | "ORGANIC" | "PAPER" | "MIXED" | "E_WASTE"
+  quantity          String       @default("MEDIUM") // "SMALL" | "MEDIUM" | "LARGE" | "OVERFLOW"
+  estimatedWeightKg Float        @default(15.0)
+  imageUrl          String?
+  latitude          Float
+  longitude         Float
+  address           String
+  priorityLevel     String       @default("MEDIUM") // "HIGH" | "MEDIUM" | "LOW"
+  priorityScore     Int          @default(50) // 0 - 100
+  aiConfidence      Float        @default(0.92)
+  status            String       @default("PENDING") // "PENDING" | "ASSIGNED" | "COLLECTED"
+  assignedWorkerId  String?
+  assignedWorker    Worker?      @relation("AssignedComplaints", fields: [assignedWorkerId], references: [id])
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+  assignments       Assignment[]
+  proofPhotos       ProofPhoto[]
+}
+
+model Assignment {
+  id          String     @id @default(cuid())
+  complaintId String
+  complaint   Complaint  @relation(fields: [complaintId], references: [id], onDelete: Cascade)
+  workerId    String
+  worker      Worker     @relation(fields: [workerId], references: [id], onDelete: Cascade)
+  assignedAt  DateTime   @default(now())
+  completedAt DateTime?
+  notes       String?
+  routeOrder  Int        @default(1)
+}
+
+model ProofPhoto {
+  id              String    @id @default(cuid())
+  complaintId     String
+  complaint       Complaint @relation(fields: [complaintId], references: [id], onDelete: Cascade)
+  workerId        String
+  worker          Worker    @relation(fields: [workerId], references: [id], onDelete: Cascade)
+  photoUrl        String
+  notes           String?
+  verifiedByAdmin Boolean   @default(false)
+  verifiedAt      DateTime?
+  uploadedAt      DateTime  @default(now())
+}
+
+model Analytics {
+  id             String   @id @default(cuid())
+  areaName       String
+  wasteType      String
+  totalVolumeKg  Float
+  complaintCount Int
+  periodDate     String // YYYY-MM-DD
+  createdAt      DateTime @default(now())
+}
+
+model Prediction {
+  id                 String   @id @default(cuid())
+  zoneName           String
+  riskLevel          String   @default("WARNING") // "CRITICAL" | "WARNING" | "STABLE"
+  predictedWasteType String
+  predictedVolumeKg  Float
+  confidenceScore    Float    @default(0.88)
+  reason             String
+  recommendation     String
+  validUntil         DateTime
+  createdAt          DateTime @default(now())
+}
